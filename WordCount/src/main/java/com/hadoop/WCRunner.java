@@ -7,32 +7,36 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.log4j.BasicConfigurator;
+
 import java.io.IOException;
 import java.lang.InterruptedException;
 import java.lang.ClassNotFoundException;
 
 
-public class WCRunner{
-	public static void main(String[] argv) throws IOException, InterruptedException, ClassNotFoundException{
-		Configuration con = new Configuration();
-		Job wcjob = Job.getInstance();
-		wcjob.setJarByClass(WCRunner.class);
+public class WCRunner {
+    public static void main(String[] argv) throws IOException, InterruptedException, ClassNotFoundException {
+        BasicConfigurator.configure(); // solve the WARN with log4j
 
-		wcjob.setMapperClass(WCMapper.class);
-		wcjob.setReducerClass(WCReducer.class);
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "WordCount");
 
-		wcjob.setCombinerClass(WCReducer.class);
+        job.setJarByClass(WCRunner.class);
 
-		wcjob.setOutputKeyClass(Text.class);
-		wcjob.setOutputValueClass(LongWritable.class);
+        job.setMapperClass(WCMapper.class);
+        job.setReducerClass(WCReducer.class);
 
-		wcjob.setMapOutputKeyClass(Text.class);
-		wcjob.setMapOutputValueClass(LongWritable.class);
+        job.setCombinerClass(WCReducer.class);
 
-		FileInputFormat.setInputPaths(wcjob, new Path("hdfs://localhost:9000/user/hadoop/input"));
-		FileOutputFormat.setOutputPath(wcjob, new Path("hdfs://localhost:9000/user/hadoop/output"));
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(LongWritable.class);
 
-		wcjob.waitForCompletion(true);
-	}
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(LongWritable.class);
 
+        FileInputFormat.setInputPaths(job, new Path("hdfs://localhost:9000/user/hadoop/input"));
+        FileOutputFormat.setOutputPath(job, new Path("hdfs://localhost:9000/user/hadoop/output"));
+
+        job.waitForCompletion(true);
+    }
 }

@@ -1,6 +1,6 @@
 /**
  * Description
- * Created with IntelliJ IDEA.
+ * Add new configuration file
  *
  * @author apktool
  * @version 0.1
