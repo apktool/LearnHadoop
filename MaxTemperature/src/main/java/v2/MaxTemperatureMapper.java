@@ -7,7 +7,7 @@
  * @since 9/8/17
  */
 
-package v1;
+package v2;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
