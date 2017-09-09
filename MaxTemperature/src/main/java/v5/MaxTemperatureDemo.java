@@ -7,8 +7,9 @@
  * @since 9/8/17
  */
 
-package v4;
+package v5;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -28,11 +29,20 @@ public class MaxTemperatureDemo extends Configured implements Tool {
 
     public int run(String[] args) throws Exception {
         if (args.length != 2) {
+            System.err.println(getClass().getSimpleName());
             System.err.println("Command error: command <input path> <output path>");
-            System.exit(-1);
+            ToolRunner.printGenericCommandUsage(System.err);
+            return -1;
         }
 
-        Job job = Job.getInstance(getConf());
+        Configuration conf = getConf();
+        conf.setBoolean("mapred.task.profile", true);
+        conf.set("mapred.task.profile.params", "-agentlib:hprof=cpu=samples," + "heap=sites,depth=6,force=n,thread=y,verbose=n,file=%s");
+        conf.set("mapred.task.profile.maps", "0-2");
+        conf.set("mapred.task.profile.reduces", "");
+
+        // Job job = Job.getInstance(conf, "Max Temperature");
+        Job job = Job.getInstance(conf);
         job.setJobName("Max Temperature");
 
         job.setJarByClass(MaxTemperatureDemo.class);
