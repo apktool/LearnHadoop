@@ -7,7 +7,7 @@
  * @since 9/8/17
  */
 
-package v3;
+package v4;
 
 import org.apache.hadoop.io.Text;
 
@@ -17,6 +17,7 @@ public class NcdcRecordParser {
 
     private String year;
     private int airTemperature;
+    private boolean airTemperatureMalformed;
     private String quality;
 
     public void parse(String record) {
@@ -38,6 +39,10 @@ public class NcdcRecordParser {
 
     public boolean isValidTemperature() {
         return airTemperature != MISSING_TEMPERATURE && quality.matches("[01459]");
+    }
+
+    public boolean isMalformedTemperature(){
+        return airTemperatureMalformed;
     }
 
     public String getYear() {

@@ -7,7 +7,7 @@
  * @since 9/8/17
  */
 
-package v3;
+package v4;
 
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -32,7 +32,7 @@ public class MaxTemperatureDemo extends Configured implements Tool {
             System.exit(-1);
         }
 
-        Job job = Job.getInstance();
+        Job job = Job.getInstance(getConf());
         job.setJobName("Max Temperature");
 
         job.setJarByClass(MaxTemperatureDemo.class);
