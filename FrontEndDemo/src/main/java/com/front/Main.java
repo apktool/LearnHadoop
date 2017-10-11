@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 
 public class Main {
-    private static HashMap<Integer, ArrayList<String>> getSqlResult(ResultSet result) throws SQLException {
+    private static HashMap<Integer, ArrayList<String>> formatResult(ResultSet result) throws SQLException {
         HashMap<Integer, ArrayList<String>> map = new HashMap<Integer, ArrayList<String>>();
         while (result.next()) {
             Integer mid = result.getInt("mid");
@@ -33,12 +33,10 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
         String sql = "select mid, title from bilibili_anime_info limit 5";
-        MySqlConnect mysql = new MySqlConnect();
-        ResultSet result = mysql.mysqlConn(sql);
+        MySqlConnect mysql = new MySqlConnect(sql);
+        ResultSet result = mysql.getResult();
 
-        HashMap<Integer, ArrayList<String>> map = getSqlResult(result);
-
-        mysql.mysqlClose();
+        HashMap<Integer, ArrayList<String>> map = formatResult(result);
 
         ProducerDemo producer = new ProducerDemo();
 

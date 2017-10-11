@@ -19,10 +19,9 @@ public class MySqlConnect {
 
     private Connection conn = null;
     private Statement stmt = null;
-    private ResultSet rs = null;
     private ResultSet result = null;
 
-    public ResultSet mysqlConn(String sql) {
+    private MySqlConnect() {
         try {
             this.conn = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/"
@@ -31,28 +30,38 @@ public class MySqlConnect {
                     , userName
                     , passWord
             );
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MySqlConnect(String sql) {
+        this();
+        try {
             this.stmt = this.conn.createStatement();
-            // stmt = conn.prepareStatement(sql);
-            // rs = stmt.getResultSet();
             this.result = this.stmt.executeQuery(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
     }
 
-    public void mysqlClose() {
-        if (rs != null) {
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (result != null || stmt != null) {
             try {
-                rs.close();
-            } catch (SQLException sqlEx) { } // ignore
-            rs = null;
-        }
-        if (stmt != null) {
-            try {
+                result.close();
                 stmt.close();
-            } catch (SQLException sqlEx) { } // ignore
-            stmt = null;
+            } catch (SQLException sqlEx) {
+                sqlEx.printStackTrace();
+            } finally {
+                result = null;
+                stmt = null;
+            }
         }
+    }
+
+    public ResultSet getResult() {
+        return this.result;
     }
 }
