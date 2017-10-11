@@ -13,6 +13,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class ProducerDemo {
@@ -42,5 +44,16 @@ public class ProducerDemo {
 
     public void sendRecorder(String topic, Integer key, String value){
         producer.send(new ProducerRecord<Integer, String>(topic, key, value));
+    }
+
+    public void setProducer(HashMap<Integer, ArrayList<String>> map) {
+        for (HashMap.Entry<Integer, ArrayList<String>> entry: map.entrySet()){
+            Integer key = entry.getKey();
+            ArrayList<String> values = entry.getValue();
+            for (String value: values) {
+                this.sendRecorder("my-topic", key, value);
+                // System.out.format("%d + %s\n", key, value);
+            }
+        }
     }
 }

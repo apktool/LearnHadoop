@@ -34,16 +34,9 @@ public class Main {
         return map;
     }
 
-    public static void createProducer(HashMap<Integer, ArrayList<String>> map){
+    public static void createProducer(HashMap<Integer, ArrayList<String>> map) {
         ProducerDemo producer = new ProducerDemo();
-        for (HashMap.Entry<Integer, ArrayList<String>> entry: map.entrySet()){
-            Integer key = entry.getKey();
-            ArrayList<String> values = entry.getValue();
-            for (String value: values) {
-                producer.sendRecorder("my-topic", key, value);
-                System.out.format("%d + %s\n", key, value);
-            }
-        }
+        producer.setProducer(map);
     }
 
     public static void createConsumer(){
@@ -66,9 +59,13 @@ public class Main {
         Method methodProducer = Main.class.getMethod("createProducer", HashMap.class);
         MyThread threadProducer = new MyThread();
         threadProducer.run(hana, methodProducer, map);
+        System.out.println("-producer->| " + threadProducer.getId());
 
         Method methodConsumer = Main.class.getMethod("createConsumer");
         MyThread threadConsumer = new MyThread();
+        System.out.println("-consumer->| " + threadConsumer.getId());
         threadConsumer.run(hana, methodConsumer);
+
+        System.out.println("Hello world");
     }
 }
