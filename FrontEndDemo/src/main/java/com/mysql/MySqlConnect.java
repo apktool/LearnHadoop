@@ -7,7 +7,7 @@
  * @since 10/10/17
  */
 
-package com.front;
+package com.mysql;
 
 import java.sql.*;
 
