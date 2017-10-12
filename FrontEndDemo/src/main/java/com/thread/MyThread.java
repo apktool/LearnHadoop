@@ -17,7 +17,6 @@ public class MyThread extends Thread{
     static private Method method;
     static private HashMap map;
 
-
     @Override
     public void run() {
         try {
@@ -33,17 +32,28 @@ public class MyThread extends Thread{
         }
     }
 
-    public void run(Object object, Method method, HashMap map) {
+    @Override
+    public synchronized void start() {
+        super.start();
+    }
+
+    public void start(Object object, Method method, HashMap map) {
         this.object = object;
         this.method = method;
         this.map = map;
-        this.run();
+        this.start();
     }
 
-    public void run(Object object, Method method) {
+    public void start(Object object, Method method) {
         this.object = object;
         this.method = method;
         this.map = null;
-        this.run();
+        this.start();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        Thread.currentThread().interrupt();
+        return;
     }
 }

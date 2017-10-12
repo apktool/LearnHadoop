@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 
 public class Main {
-    private static HashMap<Integer, ArrayList<String>> formatResult(ResultSet result) throws SQLException {
+    public static HashMap<Integer, ArrayList<String>> formatResult(ResultSet result) throws SQLException {
         HashMap<Integer, ArrayList<String>> map = new HashMap<Integer, ArrayList<String>>();
         while (result.next()) {
             Integer mid = result.getInt("mid");
@@ -45,11 +45,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws SQLException, NoSuchMethodException {
-        String sql = "select mid, title from bilibili_anime_info limit 5";
+        String sql = "select mid, title from bilibili_anime_info limit 20";
         MySqlConnect mysql = new MySqlConnect(sql);
         ResultSet result = mysql.getResult();
-
-        HashMap<Integer, ArrayList<String>> map = formatResult(result);
 
         /**
          * 使用Java反射机制实现将函数作为参数传递给另一个函数
@@ -58,14 +56,29 @@ public class Main {
         Main hana = new Main();
         Method methodProducer = Main.class.getMethod("createProducer", HashMap.class);
         MyThread threadProducer = new MyThread();
-        threadProducer.run(hana, methodProducer, map);
+        threadProducer.start(hana, methodProducer, formatResult(result));
         System.out.println("-producer->| " + threadProducer.getId());
 
         Method methodConsumer = Main.class.getMethod("createConsumer");
         MyThread threadConsumer = new MyThread();
+        threadConsumer.start(hana, methodConsumer);
         System.out.println("-consumer->| " + threadConsumer.getId());
-        threadConsumer.run(hana, methodConsumer);
 
-        System.out.println("Hello world");
+        /**
+         * 留20s的时间给kafka consumer，让kafka consumer给consumerResult赋值，然后从里面取出来打印输出
+         */
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (HashMap.Entry<Integer, ArrayList<String>> entry: ConsumerDemo.consumerResult.entrySet()){
+            Integer key = entry.getKey();
+            ArrayList<String> values = entry.getValue();
+            for (String value: values) {
+                System.out.format("%d : %s\n", key, value);
+            }
+        }
     }
 }

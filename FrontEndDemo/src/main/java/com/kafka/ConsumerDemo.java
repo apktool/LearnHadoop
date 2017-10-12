@@ -14,11 +14,14 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class ConsumerDemo {
-    static private Consumer<Integer, String> consumer;
+    private static Consumer<Integer, String> consumer;
+    public static HashMap<Integer, ArrayList<String>> consumerResult = new HashMap<Integer, ArrayList<String>>();
 
     private Consumer<Integer, String> configConsumer() {
         Properties props = new Properties();
@@ -43,14 +46,15 @@ public class ConsumerDemo {
 
     public void getConsumer() {
         consumer.subscribe(Arrays.asList("my-topic"));
+
         while (true) {
             ConsumerRecords<Integer, String> records = consumer.poll(100);
             for (ConsumerRecord<Integer, String> record : records) {
-                System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+                // System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+                ArrayList<String> values = consumerResult.containsKey(record.key()) ? consumerResult.get(record.key()) : new ArrayList<String>();
+                values.add(record.value());
+                consumerResult.put(record.key(), values);
             }
         }
-    }
-
-    public static void main(String[] args) {
     }
 }

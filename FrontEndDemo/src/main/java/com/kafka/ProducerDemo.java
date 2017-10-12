@@ -51,6 +51,11 @@ public class ProducerDemo {
             Integer key = entry.getKey();
             ArrayList<String> values = entry.getValue();
             for (String value: values) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 this.sendRecorder("my-topic", key, value);
                 // System.out.format("%d + %s\n", key, value);
             }
