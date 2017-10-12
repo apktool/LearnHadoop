@@ -8,12 +8,17 @@
  */
 package com.front;
 
+import com.itemcf.AnimeRecommend;
 import com.kafka.ConsumerDemo;
 import com.kafka.ProducerDemo;
 import com.mysql.MySqlConnect;
 import com.thread.MyThread;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,10 +30,10 @@ public class Main {
         HashMap<Integer, ArrayList<String>> map = new HashMap<Integer, ArrayList<String>>();
         while (result.next()) {
             Integer mid = result.getInt("mid");
-            String title = result.getString("title");
+            String seasonID = result.getString("season_id");
 
             ArrayList<String> value = map.containsKey(mid) ? map.get(mid) : new ArrayList<String>();
-            value.add(title);
+            value.add(seasonID);
             map.put(mid, value);
         }
         return map;
@@ -44,8 +49,8 @@ public class Main {
         consumer.getConsumer();
     }
 
-    public static void main(String[] args) throws SQLException, NoSuchMethodException {
-        String sql = "select mid, title from bilibili_anime_info limit 20";
+    public static void main(String[] args) throws SQLException, NoSuchMethodException, URISyntaxException, ClassNotFoundException, InterruptedException, IOException {
+        String sql = "select mid, season_id from bilibili_anime_info limit 100";
         MySqlConnect mysql = new MySqlConnect(sql);
         ResultSet result = mysql.getResult();
 
@@ -73,12 +78,19 @@ public class Main {
             e.printStackTrace();
         }
 
+        Writer writer = new FileWriter("src/main/resources/uid_to_bid.csv");
         for (HashMap.Entry<Integer, ArrayList<String>> entry: ConsumerDemo.consumerResult.entrySet()){
             Integer key = entry.getKey();
             ArrayList<String> values = entry.getValue();
             for (String value: values) {
-                System.out.format("%d : %s\n", key, value);
+                writer.append(Integer.toString(key) + "," + value + "," + "1\n");
+                writer.flush();
+                // System.out.format("%d : %s\n", key, value);
             }
         }
+        writer.close();
+
+        AnimeRecommend animeRecommend = new AnimeRecommend();
+        animeRecommend.start();
     }
 }
